@@ -1,0 +1,15 @@
+{
+  "include": [
+    "desktop-app/python_backend"
+  ],
+  "extraPaths": [
+    "C:\\Users\\SheteChinmay\\OneDrive - Stratacent Inc\\Desktop\\Chinmay_Personal\\GenAi POC's\\Interview TA Bot\\desktop-app\\python_backend"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "desktop-app/python_backend",
+      "pythonPath": "C:\\Users\\SheteChinmay\\OneDrive - Stratacent Inc\\Desktop\\Chinmay_Personal\\GenAi POC's\\Interview TA Bot\\InvTaBotvenv\\Scripts\\python.exe",
+      "extraPaths": ["."]
+    }
+  ]
+}

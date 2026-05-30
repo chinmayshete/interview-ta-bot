@@ -1,0 +1,144 @@
+{
+    "nodes": [
+        {
+            "id": "Project Root",
+            "group": "root",
+            "desc": "The base directory of the Interview TA Bot project.",
+            "tag": "Workspace"
+        },
+        {
+            "id": "Desktop App",
+            "group": "electron",
+            "desc": "Electron-based desktop shell orchestrating the system.",
+            "tag": "Shell"
+        },
+        {
+            "id": "Electron Main",
+            "group": "electron",
+            "desc": "Main process handling window lifecycle and sidecars.",
+            "tag": "Main Process"
+        },
+        {
+            "id": "React Frontend",
+            "group": "react",
+            "desc": "Vite-powered React UI for interviewer interaction.",
+            "tag": "Renderer"
+        },
+        {
+            "id": "FastAPI Backend",
+            "group": "fastapi",
+            "desc": "Python service handling core logic and Azure orchestration.",
+            "tag": "API Service"
+        },
+        {
+            "id": "Audio Router",
+            "group": "fastapi",
+            "desc": "API routes for Audio functionality.",
+            "tag": "Backend Logic"
+        },
+        {
+            "id": "Interview Router",
+            "group": "fastapi",
+            "desc": "API routes for Interview functionality.",
+            "tag": "Backend Logic"
+        },
+        {
+            "id": "Live_router Router",
+            "group": "fastapi",
+            "desc": "API routes for Live_router functionality.",
+            "tag": "Backend Logic"
+        },
+        {
+            "id": "Upload Router",
+            "group": "fastapi",
+            "desc": "API routes for Upload functionality.",
+            "tag": "Backend Logic"
+        },
+        {
+            "id": "Azure OpenAI",
+            "group": "openai",
+            "desc": "Generative AI (GPT-4o) for intelligent analysis.",
+            "tag": "Cloud Intelligence"
+        },
+        {
+            "id": "Azure STT",
+            "group": "azure",
+            "desc": "Speech-to-Text service for real-time transcription.",
+            "tag": "Cloud Service"
+        }
+    ],
+    "links": [
+        {
+            "source": "Project Root",
+            "target": "Desktop App",
+            "label": "Contains",
+            "value": 1
+        },
+        {
+            "source": "Desktop App",
+            "target": "Electron Main",
+            "label": "Entry Point",
+            "value": 2
+        },
+        {
+            "source": "Desktop App",
+            "target": "React Frontend",
+            "label": "User Interface",
+            "value": 2
+        },
+        {
+            "source": "Electron Main",
+            "target": "React Frontend",
+            "label": "Hosts",
+            "value": 1
+        },
+        {
+            "source": "Electron Main",
+            "target": "FastAPI Backend",
+            "label": "Spawns/Manages",
+            "value": 2
+        },
+        {
+            "source": "React Frontend",
+            "target": "FastAPI Backend",
+            "label": "Communicates (HTTP)",
+            "value": 3
+        },
+        {
+            "source": "FastAPI Backend",
+            "target": "Audio Router",
+            "label": "Includes",
+            "value": 1
+        },
+        {
+            "source": "FastAPI Backend",
+            "target": "Interview Router",
+            "label": "Includes",
+            "value": 1
+        },
+        {
+            "source": "FastAPI Backend",
+            "target": "Live_router Router",
+            "label": "Includes",
+            "value": 1
+        },
+        {
+            "source": "FastAPI Backend",
+            "target": "Upload Router",
+            "label": "Includes",
+            "value": 1
+        },
+        {
+            "source": "FastAPI Backend",
+            "target": "Azure OpenAI",
+            "label": "Analyzes Data",
+            "value": 2
+        },
+        {
+            "source": "FastAPI Backend",
+            "target": "Azure STT",
+            "label": "Streams Audio",
+            "value": 2
+        }
+    ]
+}

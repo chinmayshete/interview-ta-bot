@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard] 
+python-multipart
+openai
+httpx
+pymupdf
+python-docx
+pydantic
+pydantic-settings
+python-dotenv
+fpdf2
+pyaudiowpatch 
+websockets

@@ -1,0 +1,12 @@
+{
+  "include": ["python_backend"],
+  "extraPaths": ["python_backend"],
+  "executionEnvironments": [
+    {
+      "root": "python_backend",
+      "extraPaths": ["python_backend"]
+    }
+  ],
+  "venvPath": "../",
+  "venv": "InvTaBotvenv"
+}

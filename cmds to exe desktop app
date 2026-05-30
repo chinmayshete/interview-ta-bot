@@ -1,0 +1,40 @@
+To run your project smoothly without running into the "Port already in use" or "PowerShell Execution Policy" errors, here is the exact sequence of commands you should use. 
+
+Open a new terminal in your project root (`Interview TA Bot`), and run the following:
+
+#kill process
+taskkill /IM node.exe /F
+taskkill /IM python.exe /F
+taskkill /IM electron.exe /F
+
+# cd to desktop app
+cd desktop-app
+
+#kill process
+taskkill /IM node.exe /F
+taskkill /IM python.exe /F
+taskkill /IM electron.exe /F
+npm.cmd run desktop
+
+
+**1. Navigate to the desktop-app folder:**
+```powershell
+cd desktop-app
+```
+
+**2. Clean up any stale background processes (Optional but recommended):**
+If the app crashed previously or was closed improperly, it might leave Node or Python running in the background. Running these commands will kill them so you don't get a "Port 5173/8000 is already in use" error.
+```powershell
+taskkill /IM node.exe /F
+taskkill /IM python.exe /F
+taskkill /IM electron.exe /F
+```
+*(Note: It's completely fine if it says "process not found" for any of these, it just means they weren't running.)*
+
+**3. Start the application:**
+Use `npm.cmd` instead of just `npm`. This bypasses the PowerShell security error (`npm.ps1 cannot be loaded because running scripts is disabled`) that you might see on Windows.
+```powershell
+npm.cmd run desktop
+```
+
+This single command will spin up your Vite development server and automatically launch the Electron window along with your Python backend!

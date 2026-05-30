@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview TA Bot - Architecture Graph</title>
+    <script src="https://unpkg.com/force-graph"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+        :root {
+            --bg: #0a0c10;
+            --panel: rgba(20, 24, 33, 0.7);
+            --accent-electron: #9b59b6;
+            --accent-react: #00d8ff;
+            --accent-fastapi: #05998b;
+            --accent-azure: #0078d4;
+            --accent-openai: #10a37f;
+            --text: #e0e6ed;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        #graph {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .header {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0;
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            z-index: 10;
+            background: var(--panel);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        .legend {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10;
+            background: var(--panel);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .node-info {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 10;
+            background: var(--panel);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 20px;
+            width: 300px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .node-info.visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .node-info h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .node-info p {
+            margin: 1rem 0 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Glassmorphism accent lines */
+        .glass-edge {
+            stroke-opacity: 0.3;
+            stroke-dasharray: 4;
+            animation: dash 20s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Graphify: Interview TA Bot</h1>
+        <p>Interactive Architecture Visualization</p>
+    </div>
+
+    
+
+    <style>
+
+    .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* Variants */
+.dot-electron {
+    background: var(--accent-electron);
+    color: var(--accent-electron);
+}
+
+.dot-react {
+    background: var(--accent-react);
+    color: var(--accent-react);
+}
+
+.dot-fastapi {
+    background: var(--accent-fastapi);
+    color: var(--accent-fastapi);
+}
+
+.dot-azure {
+    background: var(--accent-azure);
+    color: var(--accent-azure);
+}
+
+.dot-openai {
+    background: var(--accent-openai);
+    color: var(--accent-openai);
+}
+    </style>
+
+    <div class="legend">
+        <div class="legend-item"><span class="dot dot-electron"></span> Electron Main</div>
+        <div class="legend-item"><span class="dot dot-react"></span> React Frontend</div>
+        <div class="legend-item"><span class="dot dot-fastapi"></span> FastAPI Backend</div>
+        <div class="legend-item"><span class="dot dot-azure"></span> Azure Cloud</div>
+        <div class="legend-item"><span class="dot dot-openai"></span> OpenAI Intelligence</div>
+    </div>
+
+    <div class="controls">
+        Scroll to Zoom • Drag to Move • Hover for Details
+    </div>
+
+    <div id="node-info" class="node-info">
+        <h3 id="info-title">Component</h3>
+        <p id="info-desc">Select a node to see more details about its role in the architecture.</p>
+        <div id="info-tag" class="badge">Internal</div>
+    </div>
+
+    <div id="graph"></div>
+
+    <script>
+        // Fetch dynamic data from graph_data.json
+        fetch('graph_data.json')
+            .then(res => res.json())
+            .then(gData => {
+                const colors = {
+                    root: '#ffffff',
+                    electron: '#9b59b6',
+                    react: '#00d8ff',
+                    fastapi: '#05998b',
+                    azure: '#0078d4',
+                    openai: '#10a37f'
+                };
+
+                const Graph = ForceGraph()
+                    (document.getElementById('graph'))
+                    .graphData(gData)
+                    .nodeId('id')
+                    .nodeVal(node => 8)
+                    .nodeLabel('id')
+                    .nodeColor(node => colors[node.group] || '#94a3b8')
+                    .linkColor(() => 'rgba(255, 255, 255, 0.2)')
+                    .linkDirectionalParticles(2)
+                    .linkDirectionalParticleSpeed(d => d.value * 0.005)
+                    .onNodeHover(node => {
+                        const info = document.getElementById('node-info');
+                        if (node) {
+                            document.getElementById('info-title').innerText = node.id;
+                            document.getElementById('info-desc').innerText = node.desc;
+                            document.getElementById('info-tag').innerText = node.tag;
+                            document.getElementById('info-tag').style.background = (colors[node.group] || '#94a3b8') + '44';
+                            document.getElementById('info-tag').style.color = (colors[node.group] || '#94a3b8');
+                            info.classList.add('visible');
+                        } else {
+                            info.classList.remove('visible');
+                        }
+                    })
+                    .nodeCanvasObject((node, ctx, globalScale) => {
+                        const label = node.id;
+                        const fontSize = 14/globalScale;
+                        ctx.font = `${fontSize}px Outfit`;
+                        const textWidth = ctx.measureText(label).width;
+
+                        // Node Glow
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 6, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = colors[node.group] || '#94a3b8';
+                        ctx.shadowBlur = 15;
+                        ctx.shadowColor = colors[node.group] || '#94a3b8';
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+
+                        // Label
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText(label, node.x, node.y + 15);
+                    });
+
+                // Responsive resize
+                window.addEventListener('resize', () => {
+                    Graph.width(window.innerWidth).height(window.innerHeight);
+                });
+            })
+            .catch(err => {
+                console.error("Failed to load graph data:", err);
+                document.getElementById('info-desc').innerText = "Error: graph_data.json not found. Run 'python graphify.py' first.";
+            });
+    </script>
+</body>
+</html>

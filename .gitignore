@@ -1,0 +1,14 @@
+.env
+uploads/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+InvTaBotvenv/
+.vscode/
+*.log
+uploads/
+node_modules/
+.agent/
+graphify-out/

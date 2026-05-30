@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Support Agent — AI-Powered Interview Assistant</title>
+    <meta name="description" content="Enterprise-grade real-time interview assistant powered by Azure OpenAI GPT-4.1. Adaptive questioning, live evaluation, and interviewer guidance." />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- ═══════ Header ═══════ -->
+    <header class="app-header">
+        <div class="app-logo">
+            <div class="logo-icon">🧠</div>
+            <div class="logo-text">
+                <h1>Interview Support Agent</h1>
+                <p>Powered by Azure OpenAI GPT-4.1</p>
+            </div>
+        </div>
+        <div class="header-status" id="header-status">
+            <span class="status-dot"></span>
+            <span class="status-text">Ready to Start</span>
+        </div>
+    </header>
+
+    <!-- ═══════ Setup Panel ═══════ -->
+    <section id="setup-panel">
+        <div class="glass-card">
+            <div class="card-header">
+                <span class="icon">📋</span>
+                <h2>Interview Setup</h2>
+            </div>
+            <div class="card-body">
+                <div class="setup-grid">
+
+                    <!-- Resume Upload -->
+                    <div>
+                        <label for="resume-file-input" style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:10px;">
+                            Candidate Resume
+                        </label>
+                        <div class="upload-zone" id="resume-upload-zone">
+                            <span class="upload-icon">📄</span>
+                            <div class="upload-label">Drop resume here or click to upload</div>
+                            <div class="upload-hint">Supports PDF and DOCX</div>
+                            <input type="file" id="resume-file-input" accept=".pdf,.docx" />
+                        </div>
+                    </div>
+
+                    <!-- JD Input -->
+                    <div>
+                        <label for="jd-textarea" style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:10px;">
+                            Job Description
+                        </label>
+                        <textarea
+                            id="jd-textarea"
+                            class="jd-textarea"
+                            placeholder="Paste the full job description here...&#10;&#10;Example:&#10;We are looking for a Senior Software Engineer with 5+ years of experience in Python, REST APIs, microservices architecture..."
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="text-center mt-20">
+                    <button class="btn-primary" id="start-btn" disabled>
+                        <span>🚀</span>
+                        Start Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ Interview Panel ═══════ -->
+    <section id="interview-panel">
+
+        <!-- Actions Bar -->
+        <div class="actions-bar">
+            <div class="actions-bar-left">
+                <span class="session-id" id="session-id-display">#—</span>
+                <div class="difficulty-indicator">
+                    <span style="font-size:0.72rem; color:var(--text-muted); margin-right:4px;">Difficulty</span>
+                    <div class="difficulty-step"></div>
+                    <div class="difficulty-step"></div>
+                    <div class="difficulty-step"></div>
+                </div>
+            </div>
+            <button class="btn-danger" id="end-btn">
+                <span>⏹</span> End Interview
+            </button>
+        </div>
+
+        <div class="interview-grid">
+            <!-- ── Main Column ──────────────────────────────────── -->
+            <div class="main-column">
+
+                <!-- Question Card -->
+                <div class="glass-card question-card" id="question-card">
+                    <div class="card-header">
+                        <span class="icon">❓</span>
+                        <h2>Current Question</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="question-meta">
+                            <span class="badge badge-easy" id="question-difficulty">EASY</span>
+                            <span class="badge badge-category" id="question-category">TECHNICAL</span>
+                            <span class="question-number" id="question-number">Q1</span>
+                        </div>
+                        <p class="question-text" id="question-text">Loading first question...</p>
+
+                        <div id="expected-answer-section" class="mt-16" style="display:none;">
+                            <div class="expected-answer">
+                                <div class="expected-answer-label">💡 Expected Answer (for interviewer)</div>
+                                <p id="expected-answer-text"></p>
+                            </div>
+                        </div>
+
+                        <div id="reference-answer-question-section" class="mt-16" style="display:none;">
+                            <div class="expected-answer" style="border-left-color: #2ECC71; background: rgba(46, 204, 113, 0.05);">
+                                <div class="expected-answer-label" style="color: #2ECC71;">📖 Reference Answer (Ideal)</div>
+                                <p id="reference-answer-question-text"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Answer Input -->
+                <div class="glass-card answer-section">
+                    <div class="card-header">
+                        <span class="icon">💬</span>
+                        <h2>Candidate's Answer</h2>
+                    </div>
+                    <div class="card-body">
+                        <textarea
+                            id="answer-textarea"
+                            class="answer-textarea"
+                            placeholder="Type the candidate's answer here, or use the microphone to record and transcribe...&#10;&#10;Press Ctrl+Enter to submit."
+                        ></textarea>
+
+                        <!-- Waveform -->
+                        <div class="waveform-container" id="waveform-container">
+                            <div class="waveform-bars"></div>
+                            <span class="recording-time">00:00</span>
+                            <span class="transcribing-label" id="transcribing-label">⏳ Transcribing...</span>
+                        </div>
+
+                        <div class="answer-controls">
+                            <button class="record-btn" id="record-btn" title="Record audio">🎙️</button>
+                            <button class="btn-primary" id="submit-btn">
+                                <span>➡️</span> Submit & Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evaluation Card -->
+                <div class="glass-card" id="evaluation-card" style="display:none;">
+                    <div class="card-header">
+                        <span class="icon">📊</span>
+                        <h2>Answer Evaluation</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="eval-grid">
+                            <div class="eval-item">
+                                <div class="eval-item-label">Rating</div>
+                                <div class="eval-rating" id="eval-rating">—</div>
+                            </div>
+                            <div class="eval-item">
+                                <div class="eval-item-label">Confidence</div>
+                                <div class="confidence-value" id="confidence-value">—</div>
+                                <div class="confidence-bar-outer">
+                                    <div class="confidence-bar-inner" id="confidence-bar" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <div class="eval-summary" id="eval-summary" style="grid-column: span 2; font-weight: 500;"></div>
+                            <div class="eval-reasoning" id="eval-reasoning" style="grid-column: span 2; margin-top: 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Follow-up Card -->
+                <div class="glass-card" id="followup-card" style="display:none;">
+                    <div class="card-header">
+                        <span class="icon">🔄</span>
+                        <h2>Suggested Follow-up</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="followup-question" id="followup-question"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Sidebar Column ───────────────────────────────── -->
+            <div class="sidebar-column">
+
+                <!-- Interviewer Guidance -->
+                <div class="glass-card" id="guidance-card" style="display:none;">
+                    <div class="card-header">
+                        <span class="icon">🎯</span>
+                        <h2>Interviewer Guidance</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="guidance-suggestion" id="guidance-suggestion"></p>
+                        <div><span class="risk-flag risk-none" id="risk-flag">✓ No Risks</span></div>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <span class="icon">📜</span>
+                        <h2>Question History</h2>
+                    </div>
+                    <div class="card-body" style="padding: 14px;">
+                        <div class="history-list" id="history-list">
+                            <div class="history-empty">No questions asked yet</div>
+                        </div>
+        </div>
+    </section>
+
+    <!-- ═══════ Summary Panel (Phase 3) ═══════ -->
+    <section id="summary-panel" style="display:none;">
+        <div class="glass-card summary-card" style="max-width: 1000px; margin: 0 auto;">
+            <div class="card-header" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="icon">🏆</span>
+                    <h2>Interview Performance Summary</h2>
+                </div>
+                <div class="summary-actions" style="display: flex; gap: 10px;">
+                    <button class="btn-secondary" id="download-pdf-btn">📄 PDF</button>
+                    <button class="btn-secondary" id="download-docx-btn">📝 Word</button>
+                    <button class="btn-primary" onclick="window.location.reload()">New Interview</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="summary-header" style="display: flex; align-items: center; gap: 30px; margin-bottom: 20px;">
+                    <div class="overall-score-disc" style="width: 120px; height: 120px;">
+                        <svg viewBox="0 0 36 36" class="circular-chart" style="display: block; margin: 10px auto; max-width: 100%; max-height: 250px;">
+                            <path class="circle-bg" stroke="#eee" stroke-width="2.8" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle" id="summary-score-circle" stroke="#818cf8" stroke-width="2.8" stroke-dasharray="0, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <text x="18" y="20.35" class="percentage" id="summary-score-text" fill="var(--text-primary)" font-family="sans-serif" font-size="0.5em" text-anchor="middle">0%</text>
+                        </svg>
+                    </div>
+                    <div class="summary-meta" style="flex: 1;">
+                        <div id="summary-rating-badge" style="display: inline-block; padding: 6px 16px; border-radius: 999px; background: var(--gradient-primary); color: white; font-weight: 700; font-size: 1rem; margin-bottom: 12px; box-shadow: var(--shadow-glow);">HIRE</div>
+                        <p class="summary-statement" id="summary-statement" style="font-size: 1.1rem; color: var(--text-primary); line-height: 1.6; font-weight: 500;"></p>
+                    </div>
+                </div>
+
+                <div class="summary-details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+                    <div class="summary-detail-item" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px;">
+                        <h3 style="font-size: 0.9rem; color: var(--accent-emerald); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">✅ Key Strengths</h3>
+                        <ul id="summary-strengths-list" style="list-style: none; padding: 0;"></ul>
+                    </div>
+                    <div class="summary-detail-item" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px;">
+                        <h3 style="font-size: 0.9rem; color: var(--accent-rose); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">⚠️ Areas for Improvement</h3>
+                        <ul id="summary-weaknesses-list" style="list-style: none; padding: 0;"></ul>
+                    </div>
+                    <div class="summary-detail-item" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px;">
+                        <h3 style="font-size: 0.9rem; color: var(--accent-indigo); margin-bottom: 12px;">💻 Technical Proficiency</h3>
+                        <p id="summary-technical" style="font-size: 0.88rem; color: var(--text-secondary);"></p>
+                    </div>
+                    <div class="summary-detail-item" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px;">
+                        <h3 style="font-size: 0.9rem; color: var(--accent-purple); margin-bottom: 12px;">🤝 Behavioral Fit</h3>
+                        <p id="summary-behavioral" style="font-size: 0.88rem; color: var(--text-secondary);"></p>
+                    </div>
+                </div>
+
+                <div class="summary-recommendation" style="margin-top: 24px; padding: 20px; background: rgba(99, 102, 241, 0.05); border-radius: var(--radius-md); border-left: 4px solid var(--accent-indigo);">
+                    <h3 style="font-size: 0.9rem; color: var(--accent-indigo); margin-bottom: 8px;">💡 Recommendation</h3>
+                    <p id="summary-recommendation" style="font-size: 1rem; color: var(--text-primary); font-weight: 500;"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- ═══════ History Modal ═══════ -->
+<div class="modal-overlay" id="history-modal-overlay">
+    <div class="glass-card modal-content" id="history-modal-content">
+        <div class="card-header" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="icon">📜</span>
+                <h2>History Detail</h2>
+            </div>
+            <button class="close-btn" id="history-modal-close">✕</button>
+        </div>
+        <div class="card-body">
+            <div class="question-meta mt-0 mb-10">
+                <span class="badge" id="modal-q-difficulty"></span>
+                <span class="question-number" id="modal-q-number" style="margin-left: 0;"></span>
+            </div>
+            <p class="question-text mb-16" id="modal-q-text"></p>
+            
+            <div class="answer-section-label" style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; margin-bottom:6px;">Candidate's Answer</div>
+            <div class="history-item-answer mb-16" id="modal-q-answer" style="padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--text-secondary); max-height: 150px; overflow-y: auto;"></div>
+            
+            <div class="eval-grid" style="margin-top:20px;">
+                <div class="eval-item">
+                    <div class="eval-item-label">Rating</div>
+                    <div class="eval-rating" id="modal-q-rating"></div>
+                </div>
+                <div class="eval-summary" id="modal-q-summary" style="grid-column: span 1; display:flex; align-items:center;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ Loading Spinner ═══════ -->
+<div class="spinner-overlay" id="spinner-overlay">
+    <div class="spinner-content">
+        <div class="spinner"></div>
+        <div class="spinner-text">Processing...</div>
+    </div>
+</div>
+
+<!-- ═══════ Toast Container ═══════ -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ═══════ Scripts ═══════ -->
+<script src="/static/js/recorder.js"></script>
+<script src="/static/js/ui.js"></script>
+<script src="/static/js/app.js"></script>
+
+</body>
+</html>
